@@ -39,7 +39,7 @@ Additionally, `group_vars` and `extra_vars` are accessible to resolve variables 
 
 ```
 {
-  resource "aws_instance" "terraform-provisioner-ansible-example" {
+  resource "aws_instance" "ansible" {
     ami = "ami-408c7f28"
     instance_type = "t1.micro"
 
