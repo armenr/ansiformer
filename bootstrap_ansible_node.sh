@@ -66,11 +66,11 @@ elif test -f "/etc/SuSE-release"; then
   then
       platform="sles"
       platform_version=`awk '/^VERSION =/ { print $3 }' /etc/SuSE-release`
-	  if test "x$platform_version" = "x10"
+	  if test "x$platform_version" = "x10" ;then
         zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_10_SDK/systemsmanagement.repo
-	  elif test "x$platform_version" = "x11"
+	  elif test "x$platform_version" = "x11" ;then
 	    zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_11_SP4/systemsmanagement.repo
-	  elif test "x$platform_version" = "x12"
+	  elif test "x$platform_version" = "x12" ;then
 	    zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_12/systemsmanagement.repo
 	  fi
 	  zypper --quiet --non-interactive refresh
@@ -78,11 +78,11 @@ elif test -f "/etc/SuSE-release"; then
   else
       platform="suse"
       platform_version=`awk '/^VERSION =/ { print $3 }' /etc/SuSE-release`
-	  if test "x$platform_version" = "x10"
+	  if test "x$platform_version" = "x10" ;then
         zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_10_SDK/systemsmanagement.repo
-	  elif test "x$platform_version" = "x11"
+	  elif test "x$platform_version" = "x11" ;then
 	    zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_11_SP4/systemsmanagement.repo
-	  elif test "x$platform_version" = "x12"
+	  elif test "x$platform_version" = "x12" ;then
 	    zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_12/systemsmanagement.repo
 	  fi
 	  zypper --quiet --non-interactive refresh
