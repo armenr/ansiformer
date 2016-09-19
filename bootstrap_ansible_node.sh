@@ -29,6 +29,10 @@ elif test -f "/etc/redhat-release"; then
   yum -y update
   yum -q -y install epel-release
   yum -q -y install ansible
+  ret=`python -c 'import sys; print("%i" % (sys.hexversion<0x03000000))'`
+  if test "x$ret" != "x0" ; then
+    yum -q -y install python-argparse python-jinja2
+  fi
 elif test -f "/etc/system-release"; then
   platform=`sed 's/^\(.\+\) release.\+/\1/' /etc/system-release | tr '[A-Z]' '[a-z]'`
   platform_version=`sed 's/^.\+ release \([.0-9]\+\).*/\1/' /etc/system-release | tr '[A-Z]' '[a-z]'`
@@ -37,9 +41,13 @@ elif test -f "/etc/system-release"; then
     # FIXME: remove client side platform_version mangling and hard coded yolo, and remapping to deprecated "el"
     platform="el"
     platform_version="6.0"
-	yum -y update
+    yum -y update
     yum -q -y install epel-release
     yum -q -y install ansible
+    ret=`python -c 'import sys; print("%i" % (sys.hexversion<0x03000000))'`
+    if test "x$ret" != "x0" ; then
+      yum -q -y install python-argparse python-jinja2
+    fi
   fi
 # Apple OS X
 elif test -f "/usr/bin/sw_vers"; then
@@ -66,27 +74,27 @@ elif test -f "/etc/SuSE-release"; then
   then
       platform="sles"
       platform_version=`awk '/^VERSION =/ { print $3 }' /etc/SuSE-release`
-	  if test "x$platform_version" = "x10" ;then
+      if test "x$platform_version" = "x10" ;then
         zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_10_SDK/systemsmanagement.repo
-	  elif test "x$platform_version" = "x11" ;then
-	    zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_11_SP4/systemsmanagement.repo
-	  elif test "x$platform_version" = "x12" ;then
-	    zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_12/systemsmanagement.repo
-	  fi
-	  zypper --quiet --non-interactive refresh
-	  zypper --quiet --non-interactive install ansible
+      elif test "x$platform_version" = "x11" ;then
+        zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_11_SP4/systemsmanagement.repo
+      elif test "x$platform_version" = "x12" ;then
+        zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_12/systemsmanagement.repo
+      fi
+      zypper --quiet --non-interactive refresh
+      zypper --quiet --non-interactive install ansible
   else
       platform="suse"
       platform_version=`awk '/^VERSION =/ { print $3 }' /etc/SuSE-release`
-	  if test "x$platform_version" = "x10" ;then
+      if test "x$platform_version" = "x10" ;then
         zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_10_SDK/systemsmanagement.repo
-	  elif test "x$platform_version" = "x11" ;then
-	    zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_11_SP4/systemsmanagement.repo
-	  elif test "x$platform_version" = "x12" ;then
-	    zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_12/systemsmanagement.repo
-	  fi
-	  zypper --quiet --non-interactive refresh
-	  zypper --quiet --non-interactive install ansible
+      elif test "x$platform_version" = "x11" ;then
+        zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_11_SP4/systemsmanagement.repo
+      elif test "x$platform_version" = "x12" ;then
+        zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_12/systemsmanagement.repo
+      fi
+      zypper --quiet --non-interactive refresh
+      zypper --quiet --non-interactive install ansible
   fi
 elif test "x$os" = "xFreeBSD"; then
   platform="freebsd"
@@ -104,4 +112,3 @@ elif test -f "/etc/os-release"; then
   platform=$ID
   platform_version=$VERSION
 fi
-
