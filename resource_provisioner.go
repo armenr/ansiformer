@@ -13,7 +13,7 @@ type ResourceProvisioner struct {
 	playbook  string // filepath for the
 	inventory string
 
-	groups    []string          // list of group-vars to be passed to the provisioner
+	group_vars    []string          // list of group-vars to be passed to the provisioner
 	hosts     []string          // list of host groups to apply to the provisioner
 	extraVars map[string]string // extra variables that can be passed to the provisioner
 }
@@ -35,7 +35,8 @@ func (r *ResourceProvisioner) Apply(
 		return err
 	}
 	provisioner.useSudo = true
-	provisioner.ansibleLocalScript = fmt.Sprintf("https://raw.githubusercontent.com/jonmorehouse/terraform-provisioner-ansible/%s/ansible-local.py", VERSION)
+	//provisioner.ansibleLocalScript = fmt.Sprintf("https://raw.githubusercontent.com/jonmorehouse/terraform-provisioner-ansible/%s/ansible-local.py", VERSION)
+	provisioner.ansibleLocalScript = fmt.Sprintf("https://gist.github.com/ravibhure/23638f678a432510d4125e62ce4c1a83/raw/1d5567f664f6ce89ec6fdc20128ef687fc346736/ansible-local.py")
 
 	// ensure that this is a linux machine
 	if s.Ephemeral.ConnInfo["type"] != "ssh" {

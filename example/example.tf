@@ -14,7 +14,7 @@ resource "aws_instance" "ansible-test" {
 		playbook = "playbook.yml"
 		plays = ["terraform"]
 		hosts = ["all"]
-		groups = ["terraform"]
+		group_vars = ["terraform"]
 		extra_vars = {
 			"extra_var": "terraform"	
 		}

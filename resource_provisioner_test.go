@@ -22,7 +22,7 @@ func testConfig(t *testing.T, c map[string]interface{}) *terraform.ResourceConfi
 
 func TestResourceProvider_Validate_good(t *testing.T) {
 	c := testConfig(t, map[string]interface{}{
-		"groups":      []interface{}{"all", "terraform"},
+		"group_vars":  []interface{}{"all", "terraform"},
 		"module_path": createTmpDir(t, "ansible"),
 		"playbook":    createTmpFile(t, "playbook.yml"),
 		"plays":       []interface{}{"test", "test"},

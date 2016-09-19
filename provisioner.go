@@ -21,7 +21,7 @@ type Provisioner struct {
 	Plays              []string          `mapstructure:"plays"`
 	Hosts              []string          `mapstructure:"hosts"`
 	ModulePath         string            `mapstructure:"module_path"`
-	Groups             []string          `mapstructure:"groups"` // group_vars are expected to be under <ModulePath>/group_var/name
+	GroupVars         []string          `mapstructure:"group_vars"` // group_vars are expected to be under <ModulePath>/group_var/name
 	ExtraVars          map[string]string `mapstructure:"extra_vars"`
 }
 
@@ -40,11 +40,9 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	provisionAnsibleCommands := []string{
 		// https://github.com/hashicorp/terraform/issues/1025
 		// cloud-init runs on fresh sources and can interfere with apt-get update commands causing intermittent failures
-		"/bin/bash -c 'until [[ -f /var/lib/cloud/instance/boot-finished ]]; do sleep 1; done'",
-		"apt-get update",
-		"apt-get install -y build-essential python-dev",
-		"curl https://bootstrap.pypa.io/get-pip.py | sudo python",
-		"pip install ansible",
+		// "/bin/bash -c 'until [[ -f /var/lib/cloud/instance/boot-finished ]]; do sleep 1; done'",
+                "sleep 20",
+                "curl -L https://gist.github.com/ravibhure/3bc92132dbff8143df248087c3911617/raw/d1c8a4abd0dddf37b032355b6b84724b308324e6/bootstrap_ansible_node.sh | sudo bash",
 	}
 
 	for _, command := range provisionAnsibleCommands {
@@ -75,12 +73,12 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	}
 
 	// build a command to run ansible on the host machine
-	command := fmt.Sprintf("curl %s | python - --playbook=%s --hosts=%s --plays=%s --groups=%s --extra-vars=%s",
+	command := fmt.Sprintf("curl -L %s | python - --playbook=%s --hosts=%s --plays=%s --group_vars=%s --extra-vars=%s",
 		p.ansibleLocalScript,
 		remotePlaybookPath,
 		strings.Join(p.Hosts, ","),
 		strings.Join(p.Plays, ","),
-		strings.Join(p.Groups, ","),
+		strings.Join(p.GroupVars, ","),
 		string(extraVars))
 
 	o.Output(fmt.Sprintf("running command: %s", command))
@@ -110,9 +108,9 @@ func (p *Provisioner) Validate() error {
 		}
 	}
 
-	for _, group := range p.Groups {
-		if group == "" {
-			return fmt.Errorf("Invalid group. groups: %s", p.Groups)
+	for _, group_vars := range p.GroupVars {
+		if group_vars == "" {
+			return fmt.Errorf("Invalid group_vars. group_vars: %s", p.GroupVars)
 		}
 	}
 
