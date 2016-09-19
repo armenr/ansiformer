@@ -9,6 +9,13 @@ os=`uname -s`
 if test -f "/etc/lsb-release" && grep -q DISTRIB_ID /etc/lsb-release && ! grep -q wrlinux /etc/lsb-release; then
   platform=`grep DISTRIB_ID /etc/lsb-release | cut -d "=" -f 2 | tr '[A-Z]' '[a-z]'`
   platform_version=`grep DISTRIB_RELEASE /etc/lsb-release | cut -d "=" -f 2`
+  if test "x$platform" = "xubuntu" ; then
+    apt-get -qq update
+    apt-get -qq -y install software-properties-common
+    apt-add-repository -y ppa:ansible/ansible
+    apt-get -qq update
+    apt-get -qq install ansible
+  fi
 elif test -f "/etc/debian_version"; then
   platform="debian"
   platform_version=`cat /etc/debian_version`
