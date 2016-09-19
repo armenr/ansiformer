@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # vim:syntax=python
+# Terraform inventory plugin
+# Author: Ravi Bhure <ravibhure@gmail.com>
+# Usages: curl -L https://raw.githubusercontent.com/ravibhure/terraform-provisioner-ansible/master/ansible-local.py | python
 
 import argparse
 import collections
@@ -77,7 +80,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--playbook', help='full filepath of the playbook', required=True)
     parser.add_argument('--extra-vars', help='json encoded string with extra vars', required=False, type=json_parser)
-    parser.add_argument('--groups', help='ansible groups', required=False, type=string_to_list)
+    parser.add_argument('--group_vars', help='ansible group vars', required=False, type=string_to_list)
     parser.add_argument('--plays', help='named plays to run', required=False, type=string_to_list)
     parser.add_argument('--hosts', help='host groups to run', required=False, type=string_to_list)
     args = parser.parse_args()
@@ -117,7 +120,7 @@ if __name__ == '__main__':
     # play. This has the unfortunate side effect that if someone has a
     # group_var that shadows the name of a play, it could be applied unexpectedly.
     # TODO: look up plays by name and fetch the host_groups explicitly to be added.
-    inventory_host_groups = args.groups + args.hosts + args.plays
+    inventory_host_groups = args.group_vars + args.hosts + args.plays
     inventory = build_inventory(loader, variable_manager, inventory_host_groups, playbook_basedir)
 
     variable_manager.set_inventory(inventory)

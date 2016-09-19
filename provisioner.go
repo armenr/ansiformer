@@ -42,7 +42,7 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 		// cloud-init runs on fresh sources and can interfere with apt-get update commands causing intermittent failures
 		// "/bin/bash -c 'until [[ -f /var/lib/cloud/instance/boot-finished ]]; do sleep 1; done'",
                 "sleep 20",
-                "curl -L https://gist.github.com/ravibhure/3bc92132dbff8143df248087c3911617/raw/d1c8a4abd0dddf37b032355b6b84724b308324e6/bootstrap_ansible_node.sh | sudo bash",
+                "curl -L https://raw.githubusercontent.com/ravibhure/terraform-provisioner-ansible/master/bootstrap_ansible_node.sh | sudo bash",
 	}
 
 	for _, command := range provisionAnsibleCommands {
