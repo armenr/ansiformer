@@ -14,7 +14,7 @@ if test -f "/etc/lsb-release" && grep -q DISTRIB_ID /etc/lsb-release && ! grep -
     apt-get -qq -y install software-properties-common
     apt-add-repository -y ppa:ansible/ansible
     apt-get -qq update
-    apt-get -qq install ansible
+    apt-get -qq -y install ansible
   fi
 elif test -f "/etc/debian_version"; then
   platform="debian"
@@ -23,7 +23,7 @@ elif test -f "/etc/debian_version"; then
   apt-get -qq -y install software-properties-common
   apt-add-repository -y ppa:ansible/ansible
   apt-get -qq update
-  apt-get -qq install ansible
+  apt-get -qq -y install ansible
 elif test -f "/etc/redhat-release"; then
   platform=`sed 's/^\(.\+\) release.*/\1/' /etc/redhat-release | tr '[A-Z]' '[a-z]'`
   platform_version=`sed 's/^.\+ release \([.0-9]\+\).*/\1/' /etc/redhat-release`
