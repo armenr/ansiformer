@@ -33,10 +33,10 @@ elif test -f "/etc/redhat-release"; then
   # FIXME: remove client side platform_version mangling and hard coded yolo
   # Change platform version for use below.
   platform_version="6.0"
-  yum -y update
+  yum -y update > /dev/null 2>&1
   yum -q -y install epel-release
-  yum-config-manager --enable epel
-  yum repolist all
+  yum-config-manager --enable epel > /dev/null 2>&1
+  yum repolist all > /dev/null 2>&1
   yum -q -y install ansible
   ret=`python -c 'import sys; print("%i" % (sys.hexversion<0x03000000))'`
   if test "x$ret" != "x0" ; then
@@ -50,10 +50,10 @@ elif test -f "/etc/system-release"; then
     # FIXME: remove client side platform_version mangling and hard coded yolo, and remapping to deprecated "el"
     platform="el"
     platform_version="6.0"
-    yum -y update
+    yum -y update > /dev/null 2>&1
     yum -q -y install epel-release
-    yum-config-manager --enable epel
-    yum repolist all
+    yum-config-manager --enable epel > /dev/null 2>&1
+    yum repolist all > /dev/null 2>&1
     yum -q -y install ansible
     ret=`python -c 'import sys; print("%i" % (sys.hexversion<0x03000000))'`
     if test "x$ret" != "x0" ; then
