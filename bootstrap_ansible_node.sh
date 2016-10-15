@@ -35,6 +35,8 @@ elif test -f "/etc/redhat-release"; then
   platform_version="6.0"
   yum -y update
   yum -q -y install epel-release
+  yum-config-manager --enable epel
+  yum repolist all
   yum -q -y install ansible
   ret=`python -c 'import sys; print("%i" % (sys.hexversion<0x03000000))'`
   if test "x$ret" != "x0" ; then
@@ -50,6 +52,8 @@ elif test -f "/etc/system-release"; then
     platform_version="6.0"
     yum -y update
     yum -q -y install epel-release
+    yum-config-manager --enable epel
+    yum repolist all
     yum -q -y install ansible
     ret=`python -c 'import sys; print("%i" % (sys.hexversion<0x03000000))'`
     if test "x$ret" != "x0" ; then
