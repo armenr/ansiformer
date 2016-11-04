@@ -79,7 +79,7 @@ if __name__ == '__main__':
     json_parser = lambda x: json.loads(x)
 
     parser.add_argument('--playbook', help='full filepath of the playbook', required=True)
-    parser.add_argument('--extra-vars', help='json encoded string with extra vars', required=False, type=json_parser)
+    parser.add_argument('--extra_vars', help='json encoded string with extra vars', required=False, type=json_parser)
     parser.add_argument('--group_vars', help='ansible group vars', required=False, type=string_to_list)
     parser.add_argument('--plays', help='named plays to run', required=False, type=string_to_list)
     parser.add_argument('--hosts', help='host groups to run', required=False, type=string_to_list)
