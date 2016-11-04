@@ -114,6 +114,7 @@ if __name__ == '__main__':
     loader = DataLoader()
     variable_manager = VariableManager()
     variable_manager.extra_vars.update(args.extra_vars)
+    #variable_manager.extra_vars = args.extra_vars
 
     # we apply an exhaustive list of groups to the host that is created in the
     # inventory, simply to ensure that we resolve the correct hosts for each
