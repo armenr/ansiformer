@@ -73,7 +73,7 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	}
 
 	// build a command to run ansible on the host machine
-	command := fmt.Sprintf("curl -L %s | python - --playbook=%s --hosts=%s --plays=%s --group_vars=%s --extra_vars=%s",
+	command := fmt.Sprintf("curl -L %s | python - --playbook=%s --hosts=%s --plays=%s --group_vars=%s --extra_vars='%s'",
 		p.ansibleLocalScript,
 		remotePlaybookPath,
 		strings.Join(p.Hosts, ","),
