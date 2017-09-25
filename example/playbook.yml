@@ -4,5 +4,6 @@
     - base
 
 - name: terraform
+  hosts: all
   roles:
     - terraform

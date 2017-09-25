@@ -52,7 +52,7 @@ Additionally, `group_vars` and `extra_vars` are accessible to resolve variables 
       group_vars = ["all"]
       hosts = ["terraform"]
       extra_vars = {
-        "env": "terraform"  
+        "env"="terraform"
       }
     }
   }
