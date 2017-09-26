@@ -11,6 +11,7 @@ import (
 
 type ResourceProvisioner struct {
 	playbook  string // filepath for the
+	ansible_version  string // ansible version to be install
 	inventory string
 
 	group_vars    []string          // list of group-vars to be passed to the provisioner
@@ -40,8 +41,7 @@ func (r *ResourceProvisioner) Apply(
 		return err
 	}
 	provisioner.useSudo = true
-	//provisioner.ansibleLocalScript = fmt.Sprintf("https://raw.githubusercontent.com/jonmorehouse/terraform-provisioner-ansible/%s/ansible-local.py", VERSION)
-	provisioner.ansibleLocalScript = fmt.Sprintf("https://raw.githubusercontent.com/ravibhure/terraform-provisioner-ansible/master/ansible-local.py")
+	provisioner.ansibleLocalScript = fmt.Sprintf("https://raw.githubusercontent.com/ravibhure/terraform-provisioner-ansible/%s/ansible-local.py", VERSION)
 
 	// ensure that this is a linux machine
 	if s.Ephemeral.ConnInfo["type"] != "ssh" {

@@ -17,6 +17,7 @@ import (
 type Provisioner struct {
 	useSudo            bool
 	ansibleLocalScript string
+        AnsibleVersion     string            `mapstructure:"ansible_version"` // Ansible version to install
 	Playbook           string            `mapstructure:"playbook"`
 	Plays              []string          `mapstructure:"plays"`
 	Hosts              []string          `mapstructure:"hosts"`
@@ -34,23 +35,19 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 		return err
 	}
 
+	// Ansible version to be install
+        ansible_version := p.AnsibleVersion
+
+
 	// commands that are needed to setup a basic environment to run the `ansible-local.py` script
 	// TODO pivot based upon different platforms and allow optional python provision steps
 	// TODO this should be configurable for folks who want to customize this
-	provisionAnsibleCommands := []string{
-		// https://github.com/hashicorp/terraform/issues/1025
-		// cloud-init runs on fresh sources and can interfere with apt-get update commands causing intermittent failures
-		// "/bin/bash -c 'until [[ -f /var/lib/cloud/instance/boot-finished ]]; do sleep 1; done'",
-                "sleep 20",
-                "curl -L https://raw.githubusercontent.com/ravibhure/terraform-provisioner-ansible/master/bootstrap_ansible_node.sh | sudo bash",
-	}
+	provisionAnsibleCommands := fmt.Sprintf("curl -L https://github.com/ravibhure/terraform-provisioner-ansible/raw/master/bootstrap_ansible_node.sh %s | sudo bash", p.AnsibleVersion)
 
-	for _, command := range provisionAnsibleCommands {
-		o.Output(fmt.Sprintf("running command: %s", command))
-		err := p.runCommand(o, comm, command)
-		if err != nil {
-			return err
-		}
+	o.Output(fmt.Sprintf("Installing ansible: version %s", ansible_version))
+
+	if err := p.runCommand(o, comm, provisionAnsibleCommands); err != nil {
+		return err
 	}
 
 	// ansible projects are structured such that the playbook file is in
@@ -95,6 +92,7 @@ func (p *Provisioner) Validate() error {
 		return err
 	}
 	p.Playbook = playbookPath
+
 
 	for _, host := range p.Hosts {
 		if host == "" {

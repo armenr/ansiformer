@@ -5,25 +5,39 @@
 
 machine=`uname -m`
 os=`uname -s`
+# ANSIBLE_VERSION if not provided, script will install default ansible version which is 2.3.1
+ANSIBLE_VERSION=$1
+
+# PIP Deps
+_pip_deps(){
+  pip --quiet install -U setuptools > /dev/null 2>&1
+  pip --quiet install -U pip > /dev/null 2>&1
+}
+
+_install_ansi(){
+  if [ ! -z $ANSIBLE_VERSION ] ; then
+    _pip_deps
+    pip --quiet install -U ansible==$ANSIBLE_VERSION > /dev/null 2>&1
+  else
+    _pip_deps
+    pip --quiet install -U 'ansible>=2.3.1,<2.4.0' > /dev/null 2>&1
+  fi
+}
 
 if test -f "/etc/lsb-release" && grep -q DISTRIB_ID /etc/lsb-release && ! grep -q wrlinux /etc/lsb-release; then
   platform=`grep DISTRIB_ID /etc/lsb-release | cut -d "=" -f 2 | tr '[A-Z]' '[a-z]'`
   platform_version=`grep DISTRIB_RELEASE /etc/lsb-release | cut -d "=" -f 2`
   if test "x$platform" = "xubuntu" ; then
-    apt-get -qq update
-    apt-get -qq -y install software-properties-common
-    apt-add-repository -y ppa:ansible/ansible
-    apt-get -qq update
-    apt-get -qq -y install ansible
+    apt-get -qq update > /dev/null 2>&1;
+    apt-get -qq -y install build-essential curl software-properties-common python-dev python-setuptools python-pip > /dev/null 2>&1;
+    _install_ansi
   fi
 elif test -f "/etc/debian_version"; then
   platform="debian"
   platform_version=`cat /etc/debian_version`
-  apt-get -qq update
-  apt-get -qq -y install software-properties-common
-  apt-add-repository -y ppa:ansible/ansible
-  apt-get -qq update
-  apt-get -qq -y install ansible
+  apt-get -qq update > /dev/null 2>&1;
+  apt-get -qq -y install build-essential curl software-properties-common python-dev python-setuptools python-pip > /dev/null 2>&1;
+  _install_ansi
 elif test -f "/etc/redhat-release"; then
   platform=`sed 's/^\(.\+\) release.*/\1/' /etc/redhat-release | tr '[A-Z]' '[a-z]'`
   platform_version=`sed 's/^.\+ release \([.0-9]\+\).*/\1/' /etc/redhat-release`
@@ -34,13 +48,15 @@ elif test -f "/etc/redhat-release"; then
   # Change platform version for use below.
   platform_version="6.0"
   yum -y update > /dev/null 2>&1
-  yum -q -y install epel-release
+  yum -q -y install epel-release > /dev/null 2>&1
   yum-config-manager --enable epel > /dev/null 2>&1
   yum repolist all > /dev/null 2>&1
-  yum -q -y install ansible
+  yum -q -y install python-devel python-pip  > /dev/null 2>&1
+  _install_ansi
   ret=`python -c 'import sys; print("%i" % (sys.hexversion<0x03000000))'`
   if test "x$ret" != "x0" ; then
     yum -q -y install python-argparse python-jinja2
+    _install_ansi
   fi
 elif test -f "/etc/system-release"; then
   platform=`sed 's/^\(.\+\) release.\+/\1/' /etc/system-release | tr '[A-Z]' '[a-z]'`
@@ -51,13 +67,15 @@ elif test -f "/etc/system-release"; then
     platform="el"
     platform_version="6.0"
     yum -y update > /dev/null 2>&1
-    yum -q -y install epel-release
+    yum -q -y install epel-release > /dev/null 2>&1
     yum-config-manager --enable epel > /dev/null 2>&1
     yum repolist all > /dev/null 2>&1
-    yum -q -y install ansible
+    yum -q -y install python-devel python-pip  > /dev/null 2>&1
+    _install_ansi
     ret=`python -c 'import sys; print("%i" % (sys.hexversion<0x03000000))'`
     if test "x$ret" != "x0" ; then
       yum -q -y install python-argparse python-jinja2
+      _install_ansi
     fi
   fi
 # Apple OS X
@@ -71,6 +89,7 @@ elif test -f "/usr/bin/sw_vers"; then
   if test $x86_64 -eq 1; then
     machine="x86_64"
   fi
+  _install_ansi
 elif test -f "/etc/release"; then
   machine=`/usr/bin/uname -p`
   if grep -q SmartOS /etc/release; then
@@ -85,27 +104,15 @@ elif test -f "/etc/SuSE-release"; then
   then
       platform="sles"
       platform_version=`awk '/^VERSION =/ { print $3 }' /etc/SuSE-release`
-      if test "x$platform_version" = "x10" ;then
-        zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_10_SDK/systemsmanagement.repo
-      elif test "x$platform_version" = "x11" ;then
-        zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_11_SP4/systemsmanagement.repo
-      elif test "x$platform_version" = "x12" ;then
-        zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_12/systemsmanagement.repo
-      fi
+      zypper --quiet --non-interactive install python-pip python-setuptools python-wheel
       zypper --quiet --non-interactive refresh
-      zypper --quiet --non-interactive install ansible
+      _install_ansi
   else
       platform="suse"
       platform_version=`awk '/^VERSION =/ { print $3 }' /etc/SuSE-release`
-      if test "x$platform_version" = "x10" ;then
-        zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_10_SDK/systemsmanagement.repo
-      elif test "x$platform_version" = "x11" ;then
-        zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_11_SP4/systemsmanagement.repo
-      elif test "x$platform_version" = "x12" ;then
-        zypper --quiet --non-interactive ar http://download.opensuse.org/repositories/systemsmanagement/SLE_12/systemsmanagement.repo
-      fi
+      zypper --quiet --non-interactive install python-pip python-setuptools python-wheel
       zypper --quiet --non-interactive refresh
-      zypper --quiet --non-interactive install ansible
+      _install_ansi
   fi
 elif test "x$os" = "xFreeBSD"; then
   platform="freebsd"

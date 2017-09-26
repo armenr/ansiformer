@@ -26,6 +26,7 @@ func TestResourceProvider_Validate_good(t *testing.T) {
 		"module_path": createTmpDir(t, "ansible"),
 		"playbook":    createTmpFile(t, "playbook.yml"),
 		"plays":       []interface{}{"test", "test"},
+		"ansible_version":       []interface{}{"2.2.1.0"},
 		"extra_vars": []interface{}{map[string]string{
 			"test": "key",
 		}},

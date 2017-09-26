@@ -30,6 +30,7 @@ func TestProvisioner_good(t *testing.T) {
 		Plays:      []string{"play1", "play2"},
 		ModulePath: createTmpDir(t, "ansible"),
 		GroupVars:     []string{"all", "terraform"},
+		AnsibleVersion:       string{"2.2.1.0"},
 		ExtraVars: map[string]string{
 			"key": "value",
 		},
