@@ -14,6 +14,10 @@ import (
 	"strings"
 )
 
+const (
+        installURL = "https://github.com/ravibhure/terraform-provisioner-ansible/raw/master/bootstrap_ansible_node.sh"
+)
+
 type Provisioner struct {
 	useSudo            bool
 	ansibleLocalScript string
@@ -35,6 +39,7 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 		return err
 	}
 
+        prefix := ""
 	// Ansible version to be install
         ansible_version := p.AnsibleVersion
 
@@ -42,13 +47,28 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	// commands that are needed to setup a basic environment to run the `ansible-local.py` script
 	// TODO pivot based upon different platforms and allow optional python provision steps
 	// TODO this should be configurable for folks who want to customize this
-	provisionAnsibleCommands := fmt.Sprintf("curl -L https://github.com/ravibhure/terraform-provisioner-ansible/raw/master/bootstrap_ansible_node.sh -av %s | sudo bash", p.AnsibleVersion)
 
-	o.Output(fmt.Sprintf("Installing ansible: version %s", ansible_version))
+        // Check before install ansible, system to be ready
+        //return p.runCommand(o, comm, fmt.Sprintf("%sbash -c 'until curl -o /dev/null -sIf %s ; do echo \"Waiting for ansible installURL to be available..\"; ((c++)) && ((c==20)) && break ; sleep 5 ; done;'", prefix, installURL))
+        err = p.runCommand(o, comm, fmt.Sprintf("%sbash -c 'until curl -o /dev/null -sIf %s ; do echo \"Waiting for ansible installURL to be available..\"; ((c++)) && ((c==20)) && break ; sleep 5 ; done'", prefix, installURL))
+        if err != nil {
+                return err
+        }
 
-	if err := p.runCommand(o, comm, provisionAnsibleCommands); err != nil {
-		return err
-	}
+        // First download the bootstrap_ansible_node.sh script for Ansible
+        err = p.runCommand(o, comm, fmt.Sprintf("%scurl -LO %s", prefix, installURL))
+        if err != nil {
+                return err
+        }
+
+        // Then execute the bootstrap_ansible_node.sh scrip to download and install Ansible
+        err = p.runCommand(o, comm, fmt.Sprintf("%sbash ./bootstrap_ansible_node.sh -av %q", prefix, ansible_version))
+        if err != nil {
+                return err
+        }
+
+        // And finally cleanup the bootstrap_ansible_node.sh script again
+        return p.runCommand(o, comm, fmt.Sprintf("%srm -f bootstrap_ansible_node.sh", prefix))
 
 	// ansible projects are structured such that the playbook file is in
 	// the top level of the module path. As such, we parse the playbook

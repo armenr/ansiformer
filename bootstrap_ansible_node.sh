@@ -6,21 +6,33 @@
 machine=`uname -m`
 os=`uname -s`
 
+wait_for() {
+    until /usr/bin/curl -sf "$1"
+    do
+      echo "Waiting for $1"
+      sleep 5
+    done
+    echo ""
+}
+
+#wait_for "http://www.ravibhure.com"
+
+# define function to check if program is installed
+# courtesy of https://gist.github.com/JamieMason/4761049
+function program_is_installed {
+    # set to 1 initially
+    local return_=1
+    # set to 0 if not found
+    type $1 >/dev/null 2>&1 || { local return_=0; }
+    # return value
+    echo $return_
+}
+
 # PIP Deps
 _pip_deps(){
   pip --quiet install -U setuptools > /dev/null 2>&1
   pip --quiet install -U pip > /dev/null 2>&1
-}
-
-# Install ansible
-_install_ansi(){
-  if [ ! -z $ANSIBLE_VERSION ] ; then
-    _pip_deps
-    pip --quiet install -U ansible==$ANSIBLE_VERSION > /dev/null 2>&1
-  else
-    _pip_deps
-    pip --quiet install -U 'ansible>=2.3.1,<2.4.0' > /dev/null 2>&1
-  fi
+  sleep 1
 }
 
 _install_system_packages(){
@@ -30,14 +42,12 @@ _install_system_packages(){
     if test "x$platform" = "xubuntu" ; then
       apt-get -qq update > /dev/null 2>&1;
       apt-get -qq -y install build-essential curl software-properties-common python-dev python-setuptools python-pip > /dev/null 2>&1;
-      #_install_ansi
     fi
   elif test -f "/etc/debian_version"; then
     platform="debian"
     platform_version=`cat /etc/debian_version`
     apt-get -qq update > /dev/null 2>&1;
     apt-get -qq -y install build-essential curl software-properties-common python-dev python-setuptools python-pip > /dev/null 2>&1;
-    #_install_ansi
   elif test -f "/etc/redhat-release"; then
     platform=`sed 's/^\(.\+\) release.*/\1/' /etc/redhat-release | tr '[A-Z]' '[a-z]'`
     platform_version=`sed 's/^.\+ release \([.0-9]\+\).*/\1/' /etc/redhat-release`
@@ -52,11 +62,9 @@ _install_system_packages(){
     yum-config-manager --enable epel > /dev/null 2>&1
     yum repolist all > /dev/null 2>&1
     yum -q -y install python-devel python-pip  > /dev/null 2>&1
-    #_install_ansi
     ret=`python -c 'import sys; print("%i" % (sys.hexversion<0x03000000))'`
     if test "x$ret" != "x0" ; then
-      yum -q -y install python-argparse python-jinja2
-      #_install_ansi
+      yum -q -y install python-argparse python-jinja2 > /dev/null 2>&1
     fi
   elif test -f "/etc/system-release"; then
     platform=`sed 's/^\(.\+\) release.\+/\1/' /etc/system-release | tr '[A-Z]' '[a-z]'`
@@ -71,11 +79,9 @@ _install_system_packages(){
       yum-config-manager --enable epel > /dev/null 2>&1
       yum repolist all > /dev/null 2>&1
       yum -q -y install python-devel python-pip  > /dev/null 2>&1
-      #_install_ansi
       ret=`python -c 'import sys; print("%i" % (sys.hexversion<0x03000000))'`
       if test "x$ret" != "x0" ; then
-        yum -q -y install python-argparse python-jinja2
-        #_install_ansi
+        yum -q -y install python-argparse python-jinja2 > /dev/null 2>&1
       fi
     fi
   # Apple OS X
@@ -89,7 +95,6 @@ _install_system_packages(){
     if test $x86_64 -eq 1; then
       machine="x86_64"
     fi
-    #_install_ansi
   elif test -f "/etc/release"; then
     machine=`/usr/bin/uname -p`
     if grep -q SmartOS /etc/release; then
@@ -103,15 +108,13 @@ _install_system_packages(){
     if grep -q 'Enterprise' /etc/SuSE-release; then
       platform="sles"
       platform_version=`awk '/^VERSION =/ { print $3 }' /etc/SuSE-release`
-      zypper --quiet --non-interactive install python-pip python-setuptools python-wheel
-      zypper --quiet --non-interactive refresh
-      #_install_ansi
+      zypper --quiet --non-interactive install python-pip python-setuptools python-wheel > /dev/null 2>&1
+      zypper --quiet --non-interactive refresh > /dev/null 2>&1
     else
       platform="suse"
       platform_version=`awk '/^VERSION =/ { print $3 }' /etc/SuSE-release`
-      zypper --quiet --non-interactive install python-pip python-setuptools python-wheel
-      zypper --quiet --non-interactive refresh
-      #_install_ansi
+      zypper --quiet --non-interactive install python-pip python-setuptools python-wheel > /dev/null 2>&1
+      zypper --quiet --non-interactive refresh > /dev/null 2>&1
     fi
   elif test "x$os" = "xFreeBSD"; then
     platform="freebsd"
@@ -149,14 +152,24 @@ while test -n "$1"; do
             if [ ! -z $ANSIBLE_VERSION ] ;then
               echo "Installing ansible version $ANSIBLE_VERSION"
               _install_system_packages
+              sleep 1
               _pip_deps
               pip --quiet install -U ansible==$ANSIBLE_VERSION > /dev/null 2>&1
+              if [ $(program_is_installed "ansible") -eq 0 ] ; then
+                sleep 1
+                pip --quiet install -U ansible==$ANSIBLE_VERSION > /dev/null 2>&1
+              fi
             else
               echo "Installing ansible latest version"
               _install_system_packages
+              sleep 1
               _pip_deps
               # https://goo.gl/ZWr5WF
               pip --quiet install -U 'ansible>=2.3.1,<2.4.0' > /dev/null 2>&1
+              if [ $(program_is_installed "ansible") -eq 0 ] ; then
+                sleep 1
+                pip --quiet install -U ansible==$ANSIBLE_VERSION > /dev/null 2>&1
+              fi
             fi
             ;;
         -h|--help)
