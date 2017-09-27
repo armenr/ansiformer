@@ -154,10 +154,10 @@ while test -n "$1"; do
               _install_system_packages
               sleep 1
               _pip_deps
-              pip --quiet install -U ansible==$ANSIBLE_VERSION > /dev/null 2>&1
+              pip --quiet install -U ansible==$ANSIBLE_VERSION
               if [ $(program_is_installed "ansible") -eq 0 ] ; then
                 sleep 1
-                pip --quiet install -U ansible==$ANSIBLE_VERSION > /dev/null 2>&1
+                pip --quiet install -U ansible==$ANSIBLE_VERSION
               fi
             else
               echo "Installing ansible latest version"
@@ -165,10 +165,10 @@ while test -n "$1"; do
               sleep 1
               _pip_deps
               # https://goo.gl/ZWr5WF
-              pip --quiet install -U 'ansible>=2.3.1,<2.4.0' > /dev/null 2>&1
+              pip --quiet install -U 'ansible>=2.3.1,<2.4.0'
               if [ $(program_is_installed "ansible") -eq 0 ] ; then
                 sleep 1
-                pip --quiet install -U ansible==$ANSIBLE_VERSION > /dev/null 2>&1
+                pip --quiet install -U ansible==$ANSIBLE_VERSION
               fi
             fi
             ;;
