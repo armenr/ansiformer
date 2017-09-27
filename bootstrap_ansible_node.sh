@@ -41,13 +41,13 @@ _install_system_packages(){
     platform_version=`grep DISTRIB_RELEASE /etc/lsb-release | cut -d "=" -f 2`
     if test "x$platform" = "xubuntu" ; then
       apt-get -qq update > /dev/null 2>&1;
-      apt-get -qq -y install build-essential curl software-properties-common python-dev python-setuptools python-pip > /dev/null 2>&1;
+      apt-get -qq -y install build-essential libssl-dev libffi-dev curl software-properties-common python-dev python-setuptools python-pip > /dev/null 2>&1;
     fi
   elif test -f "/etc/debian_version"; then
     platform="debian"
     platform_version=`cat /etc/debian_version`
     apt-get -qq update > /dev/null 2>&1;
-    apt-get -qq -y install build-essential curl software-properties-common python-dev python-setuptools python-pip > /dev/null 2>&1;
+    apt-get -qq -y install build-essential libssl-dev libffi-dev curl software-properties-common python-dev python-setuptools python-pip > /dev/null 2>&1;
   elif test -f "/etc/redhat-release"; then
     platform=`sed 's/^\(.\+\) release.*/\1/' /etc/redhat-release | tr '[A-Z]' '[a-z]'`
     platform_version=`sed 's/^.\+ release \([.0-9]\+\).*/\1/' /etc/redhat-release`
@@ -61,7 +61,7 @@ _install_system_packages(){
     yum -q -y install epel-release > /dev/null 2>&1
     yum-config-manager --enable epel > /dev/null 2>&1
     yum repolist all > /dev/null 2>&1
-    yum -q -y install python-devel python-pip  > /dev/null 2>&1
+    yum -q -y install gcc libffi-devel openssl-devel curl python-devel python-pip  > /dev/null 2>&1
     ret=`python -c 'import sys; print("%i" % (sys.hexversion<0x03000000))'`
     if test "x$ret" != "x0" ; then
       yum -q -y install python-argparse python-jinja2 > /dev/null 2>&1
@@ -78,7 +78,7 @@ _install_system_packages(){
       yum -q -y install epel-release > /dev/null 2>&1
       yum-config-manager --enable epel > /dev/null 2>&1
       yum repolist all > /dev/null 2>&1
-      yum -q -y install python-devel python-pip  > /dev/null 2>&1
+      yum -q -y install gcc libffi-devel openssl-devel curl python-devel python-pip  > /dev/null 2>&1
       ret=`python -c 'import sys; print("%i" % (sys.hexversion<0x03000000))'`
       if test "x$ret" != "x0" ; then
         yum -q -y install python-argparse python-jinja2 > /dev/null 2>&1

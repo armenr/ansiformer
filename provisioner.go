@@ -26,7 +26,7 @@ type Provisioner struct {
 	Plays              []string          `mapstructure:"plays"`
 	Hosts              []string          `mapstructure:"hosts"`
 	ModulePath         string            `mapstructure:"module_path"`
-	GroupVars         []string          `mapstructure:"group_vars"` // group_vars are expected to be under <ModulePath>/group_var/name
+	GroupVars          []string          `mapstructure:"group_vars"` // group_vars are expected to be under <ModulePath>/group_var/name
 	ExtraVars          map[string]string `mapstructure:"extra_vars"`
 }
 
@@ -49,26 +49,16 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	// TODO this should be configurable for folks who want to customize this
 
         // Check before install ansible, system to be ready
-        //return p.runCommand(o, comm, fmt.Sprintf("%sbash -c 'until curl -o /dev/null -sIf %s ; do echo \"Waiting for ansible installURL to be available..\"; ((c++)) && ((c==20)) && break ; sleep 5 ; done;'", prefix, installURL))
         err = p.runCommand(o, comm, fmt.Sprintf("%sbash -c 'until curl -o /dev/null -sIf %s ; do echo \"Waiting for ansible installURL to be available..\"; ((c++)) && ((c==20)) && break ; sleep 5 ; done'", prefix, installURL))
         if err != nil {
                 return err
         }
 
-        // First download the bootstrap_ansible_node.sh script for Ansible
-        err = p.runCommand(o, comm, fmt.Sprintf("%scurl -LO %s", prefix, installURL))
-        if err != nil {
-                return err
-        }
-
         // Then execute the bootstrap_ansible_node.sh scrip to download and install Ansible
-        err = p.runCommand(o, comm, fmt.Sprintf("%sbash ./bootstrap_ansible_node.sh -av %q", prefix, ansible_version))
+        err = p.runCommand(o, comm, fmt.Sprintf("%scurl -L %s | sudo bash -s -- -av %s", prefix, ansible_version))
         if err != nil {
                 return err
         }
-
-        // And finally cleanup the bootstrap_ansible_node.sh script again
-        return p.runCommand(o, comm, fmt.Sprintf("%srm -f bootstrap_ansible_node.sh", prefix))
 
 	// ansible projects are structured such that the playbook file is in
 	// the top level of the module path. As such, we parse the playbook
