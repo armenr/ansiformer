@@ -42,7 +42,7 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	// commands that are needed to setup a basic environment to run the `ansible-local.py` script
 	// TODO pivot based upon different platforms and allow optional python provision steps
 	// TODO this should be configurable for folks who want to customize this
-	provisionAnsibleCommands := fmt.Sprintf("curl -L https://github.com/ravibhure/terraform-provisioner-ansible/raw/master/bootstrap_ansible_node.sh %s | sudo bash", p.AnsibleVersion)
+	provisionAnsibleCommands := fmt.Sprintf("curl -L https://github.com/ravibhure/terraform-provisioner-ansible/raw/master/bootstrap_ansible_node.sh -av %s | sudo bash", p.AnsibleVersion)
 
 	o.Output(fmt.Sprintf("Installing ansible: version %s", ansible_version))
 

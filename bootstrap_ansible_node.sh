@@ -140,30 +140,27 @@ print_usage() {
 # Make sure the correct number of command line
 # arguments have been supplied
 
-if [ $# -lt 1 ]; then
-    print_usage
-    exit 1
-fi
-
 # Grab the command line arguments
 while test -n "$1"; do
     case "$1" in
         -av|--ansible_version)
             ANSIBLE_VERSION=$2
             # ANSIBLE_VERSION if not provided, script will install default ansible version which is 2.3.1
-            echo "Installing ansible version $ANSIBLE_VERSION"
-            _install_system_packages
-            _pip_deps
-            pip --quiet install -U ansible==$ANSIBLE_VERSION > /dev/null 2>&1
+            if [ ! -z $ANSIBLE_VERSION ] ;then
+              echo "Installing ansible version $ANSIBLE_VERSION"
+              _install_system_packages
+              _pip_deps
+              pip --quiet install -U ansible==$ANSIBLE_VERSION > /dev/null 2>&1
+            else
+              echo "Installing ansible latest version"
+              _install_system_packages
+              _pip_deps
+              # https://goo.gl/ZWr5WF
+              pip --quiet install -U 'ansible>=2.3.1,<2.4.0' > /dev/null 2>&1
+            fi
             ;;
         -h|--help)
             print_usage
-            ;;
-        *)
-            echo "Installing ansible latest version"
-            _install_system_packages
-            _pip_deps
-            pip --quiet install -U 'ansible>=2.3.1,<2.4.0' > /dev/null 2>&1
             ;;
     esac
     shift
