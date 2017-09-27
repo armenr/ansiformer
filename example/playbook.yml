@@ -7,3 +7,10 @@
   hosts: all
   roles:
     - terraform
+
+- name: output
+  hosts: all
+  tasks:
+    - shell: "ansible --version"
+      register: ansiver
+    - debug: var=ansiver.stdout_lines

@@ -55,7 +55,7 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
         }
 
         // Then execute the bootstrap_ansible_node.sh scrip to download and install Ansible
-        err = p.runCommand(o, comm, fmt.Sprintf("%scurl -L %s | sudo bash -s -- -av %s", prefix, ansible_version))
+        err = p.runCommand(o, comm, fmt.Sprintf("%scurl -L %s | sudo bash -s -- -av %s", prefix, installURL, ansible_version))
         if err != nil {
                 return err
         }
