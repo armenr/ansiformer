@@ -6,6 +6,7 @@
 ANSIBLE_VERSION=$1
 
 _pip_deps(){
+  easy_install pip > /dev/null 2>&1;
   pip --quiet install -U setuptools > /dev/null 2>&1
   pip --quiet install -U pip > /dev/null 2>&1
 }
@@ -13,17 +14,15 @@ _pip_deps(){
 sleep 20 ;
 if [[ -f /etc/redhat-release ]];then 
   yum -y update  > /dev/null 2>&1 && \
-  yum -q -y install gcc libffi-devel openssl-devel curl python-devel  > /dev/null 2>&1;
-  easy_install pip > /dev/null 2>&1;
+  yum -q -y install libffi-devel openssl-devel python-devel  > /dev/null 2>&1;
 elif [[ -f /etc/debian_version ]]; then
   apt-get -qq update > /dev/null 2>&1 && \
-  apt-get -qq -y install build-essential libssl-dev libffi-dev curl software-properties-common python-dev python-setuptools python-pip > /dev/null 2>&1;
+  apt-get -qq -y install build-essential libssl-dev libffi-dev software-properties-common python-dev python-setuptools > /dev/null 2>&1;
 elif [[ -f /etc/fedora-release ]]; then
-  dnf -y upgrade python-setuptools  > /dev/null 2>&1 && \
-  dnf -y install gcc libffi-devel openssl-devel curl python-devel python-pip python-wheel > /dev/null 2>&1;
+  dnf -y install libffi-devel openssl-devel python-devel python-setuptools > /dev/null 2>&1;
 elif [[ -f /etc/SuSE-release ]]; then
-  zypper --quiet --non-interactive install python-pip python-setuptools python-wheel > /dev/null 2>&1
   zypper --quiet --non-interactive refresh > /dev/null 2>&1
+  zypper --quiet --non-interactive install libffi-devel openssl-devel python-devel python-setuptools > /dev/null 2>&1
 else
   echo "nothing to do"
 fi
