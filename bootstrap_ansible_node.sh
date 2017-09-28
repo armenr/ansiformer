@@ -13,9 +13,8 @@ _pip_deps(){
 sleep 20 ;
 if [[ -f /etc/redhat-release ]];then 
   yum -y update  > /dev/null 2>&1 && \
-  yum -q -y install epel-release > /dev/null 2>&1
-  yum -q -y groupinstall \"Development Tools\"  > /dev/null 2>&1 && \
-  yum -q -y install gcc libffi-devel openssl-devel curl python-devel python-pip  > /dev/null 2>&1;
+  yum -q -y install gcc libffi-devel openssl-devel curl python-devel  > /dev/null 2>&1;
+  easy_install pip > /dev/null 2>&1;
 elif [[ -f /etc/debian_version ]]; then
   apt-get -qq update > /dev/null 2>&1 && \
   apt-get -qq -y install build-essential libssl-dev libffi-dev curl software-properties-common python-dev python-setuptools python-pip > /dev/null 2>&1;
