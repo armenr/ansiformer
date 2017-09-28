@@ -11,7 +11,7 @@ _pip_deps(){
   pip --quiet install -U pip > /dev/null 2>&1
 }
 # just to sleep
-sleep 20 ;
+sleep 10 ;
 if [[ -f /etc/redhat-release ]];then 
   yum -y update  > /dev/null 2>&1 && \
   yum -q -y install libffi-devel openssl-devel python-devel  > /dev/null 2>&1;
@@ -26,7 +26,7 @@ elif [[ -f /etc/SuSE-release ]]; then
 else
   echo "nothing to do"
 fi
-#curl -s -L https://bootstrap.pypa.io/get-pip.py | sudo python
+# main program starts ;)
 if [ ! -z $ANSIBLE_VERSION ] ; then
   _pip_deps
   pip --quiet install -U ansible==$ANSIBLE_VERSION
