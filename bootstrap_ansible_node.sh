@@ -29,8 +29,8 @@ fi
 # main program starts ;)
 if [ ! -z $ANSIBLE_VERSION ] ; then
   _pip_deps
-  pip --quiet install -U ansible==$ANSIBLE_VERSION
+  pip --quiet --log /tmp/pip.log install -U ansible==$ANSIBLE_VERSION
 else
   _pip_deps
-  pip --quiet install -U 'ansible>=2.3.1,<2.4.0'
+  pip --quiet --log /tmp/pip.log install -U 'ansible>=2.3.1,<2.4.0'
 fi
