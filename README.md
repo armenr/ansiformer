@@ -7,6 +7,8 @@
 
 This provisioner provides the ability to apply **host-groups**, **plays** or **roles** against a host at provision time. Ansible is run on the host itself and this provisioner configures a dynamic inventory on the fly as resources are created.
 
+The ansible terraform provisioner configures Ansible to run on the machine by Terraform from local Playbook and Role files. Playbooks and Roles can be uploaded from your local machine to the remote machine. Ansible is run in [local mode](https://docs.ansible.com/ansible/playbooks_delegation.html#local-playbooks) via the ansible-playbook command.
+
 **terraform-provisioner-ansible** is shipped as a **Terraform** [module](https://www.terraform.io/docs/modules/create.html). To include it, simply download the binary and enable it as a terraform module in your **terraformrc**.
 
 ## Installation
@@ -16,9 +18,9 @@ This provisioner provides the ability to apply **host-groups**, **plays** or **r
 To install, download and un-archive the binary and place it on your path.
 
 ```bash
-$ https://github.com/jonmorehouse/terraform-provisioner-ansible/releases/download/0.0.1-terraform-provisioner-ansible.tar.gz
+$ https://github.com/ravibhure/terraform-provisioner-ansible/releases/download/terraform-provisioner-ansible-0.0.6.tar.gz
 
-$ tar -xvf 0.0.1-terraform-provisioner-ansible.tar.gz /usr/local/bin
+$ tar -xvf terraform-provisioner-ansible-0.0.6.tar.gz /usr/local/bin
 ```
 
 Once installed, a `~/.terraformrc` file is used to _enable_ the plugin.
@@ -32,6 +34,8 @@ providers {
 ## Usage
 
 Once installed, you can provision resources by including an `ansible` provisioner block.
+
+NOTE: If not provided `ansible_version`, by default this will install latest ansible version.
 
 The following example demonstrates a configuration block to apply a host group's plays to new instances. You can specify a list of hostgroups and a list of plays to specify which ansible tasks to perform on the host.
 
@@ -48,6 +52,7 @@ Additionally, `group_vars` and `extra_vars` are accessible to resolve variables 
         user = "ubuntu"
       }
 
+      ansible_version = "2.2.1.0"
       playbook = "ansible/playbook.yml"
       group_vars = ["all"]
       hosts = ["terraform"]
@@ -61,3 +66,10 @@ Additionally, `group_vars` and `extra_vars` are accessible to resolve variables 
 
 Check out [example](example/) for a more detailed walkthrough of the provisioner and how to provision resources with **ansible**.
 
+## History
+
+See release notes for changes https://github.com/ravibhure/terraform-provisioner-ansible/releases
+
+## Inspiration
+
+* This is forked of originally written by [jonmorehouse](https://github.com/jonmorehouse/terraform-provisioner-ansible)
