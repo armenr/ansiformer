@@ -5,14 +5,10 @@
 # ANSIBLE_VERSION if not provided, script will install default ansible version which is 2.3.1
 ANSIBLE_VERSION=$1
 
-_pip_deps(){
-  easy_install pip > /dev/null 2>&1;
-  pip --quiet install -U setuptools > /dev/null 2>&1
-  pip --quiet install -U pip > /dev/null 2>&1
-}
+
 # just to sleep
-sleep 10 ;
-if [[ -f /etc/redhat-release ]];then 
+# sleep 5 ;
+if [[ -f /etc/redhat-release ]]; then 
   yum -y update  > /dev/null 2>&1 && \
   yum -q -y install gcc libffi-devel openssl-devel python-devel  > /dev/null 2>&1;
 elif [[ -f /etc/debian_version ]]; then
@@ -24,13 +20,21 @@ elif [[ -f /etc/SuSE-release ]]; then
   zypper --quiet --non-interactive refresh > /dev/null 2>&1
   zypper --quiet --non-interactive install libffi-devel openssl-devel python-devel python-setuptools > /dev/null 2>&1
 else
-  echo "nothing to do"
+  echo "Nothing to do"
 fi
-# main program starts ;)
-if [ ! -z $ANSIBLE_VERSION ] ; then
-  _pip_deps
-  pip --quiet --log /tmp/pip.log install -U ansible==$ANSIBLE_VERSION
+
+if hash ansible 2>/dev/null; then
+  echo 'Ansible already installed!!' >&2
+  echo 'Proceeding with instance provisioning' >&2
+  exit 0
 else
-  _pip_deps
-  pip --quiet --log /tmp/pip.log install -U 'ansible>=2.3.1,<2.4.0'
+    echo 'Installing pip, python dependencies, and Ansible' >&2
+    echo 'Please stand by' >&2
+    easy_install pip > /dev/null 2>&1
+    echo 'easy_install pip successful' >&2
+    pip -qqq install -U setuptools > /dev/null 2>&1
+    echo 'Installed setuptools' >&2
+    pip -qqq install -U pip > /dev/null 2>&1
+    pip -qqq --log /tmp/pip.log install -U 'ansible>=2.3.2,<2.4.0' > /dev/null 2>&1
+    echo 'Successfully installed Ansible. Provisioning host...' >&2
 fi
