@@ -72,4 +72,5 @@ See release notes for changes https://github.com/ravibhure/terraform-provisioner
 
 ## Inspiration
 
-* This is forked of originally written by [jonmorehouse](https://github.com/jonmorehouse/terraform-provisioner-ansible)
+* This is forked from ravibhure (https://github.com/ravibhure/terraform-provisioner-ansible/)
+* ...Which is a fork of this project, originally written by [jonmorehouse](https://github.com/jonmorehouse/terraform-provisioner-ansible)
