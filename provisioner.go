@@ -19,6 +19,10 @@ const (
 	installURL = "https://github.com/armenr/terraform-provisioner-ansible/raw/master/bootstrap_ansible_node.sh"
 )
 
+const (
+	tmpPath = "/tmp/ansible"
+)
+
 type Provisioner struct {
 	useSudo            bool
 	ansibleLocalScript string
@@ -65,6 +69,18 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	// path's directory and upload the entire thing
 	playbookDir := filepath.Dir(playbookPath)
 
+	// remove stale ansible files from last successful run
+	// this lets you make rapid changes & deploys from the branch
+	// you're working in
+	deleteCommand := fmt.Sprintf("sudo rm -rf /tmp/ansible")
+
+	if _, err := os.Stat(tmpPath); !os.IsExist(err) {
+		o.Output(fmt.Sprintf("Removing old playbooks plays with: \n %s", deleteCommand))
+		if err := p.runCommand(o, comm, deleteCommand); err != nil {
+			return err
+		}
+	}
+
 	// the host playbook path is the path on the host where the playbook
 	// will be uploaded too
 	remotePlaybookPath := filepath.Join("/tmp/ansible", filepath.Base(playbookPath))
@@ -72,9 +88,9 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	// check if /tmp/ansible exists, and nuke it
 	// this is so that you can deploy changes to roles or playbooks
 	// as you make them
-	if err := os.Stat("/tmp/ansible"); os.IsNotExist(err) {
-		os.Remove("/tmp/ansible")
-	}
+	// if err := os.Stat("/tmp/ansible/"); os.IsNotExist(err) {
+	// 	os.Remove("/tmp/ansible")
+	// }
 
 	// upload ansible source and playbook to the host
 	if err := comm.UploadDir("/tmp/ansible", playbookDir); err != nil {
