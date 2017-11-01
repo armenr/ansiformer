@@ -3,25 +3,30 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/hashicorp/terraform/communicator"
 	"github.com/hashicorp/terraform/communicator/remote"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/mitchellh/go-homedir"
 	"github.com/mitchellh/go-linereader"
-	"io"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 const (
-        installURL = "https://github.com/ravibhure/terraform-provisioner-ansible/raw/master/bootstrap_ansible_node.sh"
+	installURL = "https://github.com/armenr/terraform-provisioner-ansible/raw/master/bootstrap_ansible_node.sh"
+)
+
+const (
+	tmpPath = "/tmp/ansible"
 )
 
 type Provisioner struct {
 	useSudo            bool
 	ansibleLocalScript string
-        AnsibleVersion     string            `mapstructure:"ansible_version"` // Ansible version to install
+	AnsibleVersion     string            `mapstructure:"ansible_version"` // Ansible version to install
 	Playbook           string            `mapstructure:"playbook"`
 	Plays              []string          `mapstructure:"plays"`
 	Hosts              []string          `mapstructure:"hosts"`
@@ -39,31 +44,42 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 		return err
 	}
 
-        prefix := ""
+	prefix := ""
 	// Ansible version to be install
-        ansible_version := p.AnsibleVersion
-
+	ansible_version := p.AnsibleVersion
 
 	// commands that are needed to setup a basic environment to run the `ansible-local.py` script
 	// TODO pivot based upon different platforms and allow optional python provision steps
 	// TODO this should be configurable for folks who want to customize this
 
-        // Check before install ansible, system to be ready
-        err = p.runCommand(o, comm, fmt.Sprintf("%sbash -c 'until curl -o /dev/null -sIf %s ; do echo \"Waiting for ansible installURL to be available..\"; ((c++)) && ((c==20)) && break ; sleep 5 ; done'", prefix, installURL))
-        if err != nil {
-                return err
-        }
+	// Check before install ansible, system to be ready
+	err = p.runCommand(o, comm, fmt.Sprintf("%sbash -c 'until curl -o /dev/null -sIf %s ; do echo \"Waiting for ansible installURL to be available..\"; ((c++)) && ((c==20)) && break ; sleep 5 ; done'", prefix, installURL))
+	if err != nil {
+		return err
+	}
 
-        // Then execute the bootstrap_ansible_node.sh scrip to download and install Ansible
-        err = p.runCommand(o, comm, fmt.Sprintf("%scurl -L %s | sudo bash -s -- %s", prefix, installURL, ansible_version))
-        if err != nil {
-                return err
-        }
+	// Then execute the bootstrap_ansible_node.sh script to download and install Ansible
+	err = p.runCommand(o, comm, fmt.Sprintf("%scurl -L -s -S %s | sudo bash -s -- %s", prefix, installURL, ansible_version))
+	if err != nil {
+		return err
+	}
 
 	// ansible projects are structured such that the playbook file is in
 	// the top level of the module path. As such, we parse the playbook
 	// path's directory and upload the entire thing
 	playbookDir := filepath.Dir(playbookPath)
+
+	// remove stale ansible files from last successful run
+	// this lets you make rapid changes & deploys from the branch
+	// you're working in
+	deleteCommand := fmt.Sprintf("rm -rf /tmp/ansible")
+
+	if _, err := os.Stat(tmpPath); !os.IsExist(err) {
+		o.Output(fmt.Sprintf("Removing old playbooks plays with: %s", deleteCommand))
+		if err := p.runCommand(o, comm, deleteCommand); err != nil {
+			return err
+		}
+	}
 
 	// the host playbook path is the path on the host where the playbook
 	// will be uploaded too
@@ -80,15 +96,27 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	}
 
 	// build a command to run ansible on the host machine
-	command := fmt.Sprintf("curl -L %s | python - --playbook=%s --hosts=%s --plays=%s --group_vars=%s --extra_vars='%s'",
-		p.ansibleLocalScript,
+	command := fmt.Sprintf("curl -LSs https://raw.githubusercontent.com/armenr/terraform-provisioner-ansible/master/ansible-local.py | python - --playbook=%s --hosts=%s --plays=%s --group_vars=%s --extra_vars='%s'",
 		remotePlaybookPath,
 		strings.Join(p.Hosts, ","),
 		strings.Join(p.Plays, ","),
 		strings.Join(p.GroupVars, ","),
 		string(extraVars))
 
-	o.Output(fmt.Sprintf("running command: %s", command))
+	// o.Output(fmt.Sprintf("running command: %s", command))
+	// if err := p.runCommand(o, comm, command); err != nil {
+	// 	return err
+	// }
+
+	// 	o.Output(fmt.Sprintf("Running ansible plays with: \n %s", command))
+	// 	if err := p.runCommand(o, comm, command); err != nil {
+	// 		return err
+	// 	}
+
+	// 	return nil
+	// }
+
+	o.Output(fmt.Sprintf("Running the following Ansible plays on target host: \n --> Playbook: %s \n --> Plays: %s", remotePlaybookPath, strings.Join(p.Hosts, ",")))
 	if err := p.runCommand(o, comm, command); err != nil {
 		return err
 	}
@@ -102,7 +130,6 @@ func (p *Provisioner) Validate() error {
 		return err
 	}
 	p.Playbook = playbookPath
-
 
 	for _, host := range p.Hosts {
 		if host == "" {

@@ -41,7 +41,7 @@ func (r *ResourceProvisioner) Apply(
 		return err
 	}
 	provisioner.useSudo = true
-	provisioner.ansibleLocalScript = fmt.Sprintf("https://raw.githubusercontent.com/ravibhure/terraform-provisioner-ansible/%s/ansible-local.py", VERSION)
+	provisioner.ansibleLocalScript = fmt.Sprintf("https://raw.githubusercontent.com/armer/terraform-provisioner-ansible/%s/ansible-local.py", VERSION)
 
 	// ensure that this is a linux machine
 	if s.Ephemeral.ConnInfo["type"] != "ssh" {

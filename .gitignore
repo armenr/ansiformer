@@ -1,1 +1,6 @@
 terraform-provisioner-ansible
+.kitchen*
+default.yml
+.DS_STORE
+roles
+installer.sh
