@@ -85,13 +85,6 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	// will be uploaded too
 	remotePlaybookPath := filepath.Join("/tmp/ansible", filepath.Base(playbookPath))
 
-	// check if /tmp/ansible exists, and nuke it
-	// this is so that you can deploy changes to roles or playbooks
-	// as you make them
-	// if err := os.Stat("/tmp/ansible/"); os.IsNotExist(err) {
-	// 	os.Remove("/tmp/ansible")
-	// }
-
 	// upload ansible source and playbook to the host
 	if err := comm.UploadDir("/tmp/ansible", playbookDir); err != nil {
 		return err
