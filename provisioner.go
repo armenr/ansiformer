@@ -72,10 +72,10 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	// remove stale ansible files from last successful run
 	// this lets you make rapid changes & deploys from the branch
 	// you're working in
-	deleteCommand := fmt.Sprintf("sudo rm -rf /tmp/ansible")
+	deleteCommand := fmt.Sprintf("rm -rf /tmp/ansible")
 
 	if _, err := os.Stat(tmpPath); !os.IsExist(err) {
-		o.Output(fmt.Sprintf("Removing old playbooks plays with: \n %s", deleteCommand))
+		o.Output(fmt.Sprintf("Removing old playbooks plays with: %s", deleteCommand))
 		if err := p.runCommand(o, comm, deleteCommand); err != nil {
 			return err
 		}
@@ -115,7 +115,15 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	// 	return err
 	// }
 
-	o.Output(fmt.Sprintf("Running ansible plays with: \n %s", command))
+	// 	o.Output(fmt.Sprintf("Running ansible plays with: \n %s", command))
+	// 	if err := p.runCommand(o, comm, command); err != nil {
+	// 		return err
+	// 	}
+
+	// 	return nil
+	// }
+
+	o.Output(fmt.Sprintf("Running the following Ansible plays on target host: \n --> Playbook: %s \n --> Plays: %s", remotePlaybookPath, strings.Join(p.Hosts, ",")))
 	if err := p.runCommand(o, comm, command); err != nil {
 		return err
 	}
