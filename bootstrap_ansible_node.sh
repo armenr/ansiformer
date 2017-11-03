@@ -35,6 +35,6 @@ else
     pip -qqq install -U setuptools > /dev/null 2>&1
     echo 'Installed setuptools' >&2
     pip -qqq install -U pip > /dev/null 2>&1
-    pip -qqq --log /tmp/pip.log install -U 'ansible>=2.3.2,<2.4.0' > /dev/null 2>&1
+    pip -qqq --log /tmp/pip.log install -U 'ansible' > /dev/null 2>&1
     echo 'Successfully installed Ansible. Provisioning host...' >&2
 fi
