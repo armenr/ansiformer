@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -23,6 +22,14 @@ const (
 	tmpPath = "/tmp/ansible"
 )
 
+const (
+	tmpInventory = "/tmp"
+)
+
+// const (
+// 	hostfile = "/tmp/ansible"
+// )
+
 type Provisioner struct {
 	useSudo            bool
 	ansibleLocalScript string
@@ -33,6 +40,8 @@ type Provisioner struct {
 	ModulePath         string            `mapstructure:"module_path"`
 	GroupVars          []string          `mapstructure:"group_vars"` // group_vars are expected to be under <ModulePath>/group_var/name
 	ExtraVars          map[string]string `mapstructure:"extra_vars"`
+	InstanceID         string            `mapstructure:"instance_id"`
+	// AnsibleInventoryFile string            `mapstructure:"inventory_file"`
 }
 
 func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) error {
@@ -47,6 +56,7 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	prefix := ""
 	// Ansible version to be install
 	ansible_version := p.AnsibleVersion
+	// instanceid := p.InstanceID
 
 	// commands that are needed to setup a basic environment to run the `ansible-local.py` script
 	// TODO pivot based upon different platforms and allow optional python provision steps
@@ -90,10 +100,10 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 		return err
 	}
 
-	extraVars, err := json.Marshal(p.ExtraVars)
-	if err != nil {
-		return err
-	}
+	// extraVars, err := json.Marshal(p.ExtraVars)
+	// if err != nil {
+	// 	return err
+	// }
 
 	// build a command to run ansible on the host machine
 	// command := fmt.Sprintf("curl -LSs https://raw.githubusercontent.com/armenr/terraform-provisioner-ansible/master/ansible-local.py | python - --playbook=%s --hosts=%s --plays=%s --group_vars=%s --extra_vars='%s'",
@@ -103,7 +113,10 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	// 	strings.Join(p.GroupVars, ","),
 	// 	string(extraVars))
 
-	command2 := fmt.Sprintf("ansible-playbook %s", remotePlaybookPath)
+	command2 := fmt.Sprintf("ansible-playbook -i %s/%s-inventory %s",
+		tmpInventory,
+		string(p.InstanceID),
+		remotePlaybookPath)
 
 	// o.Output(fmt.Sprintf("running command: %s", command))
 	// if err := p.runCommand(o, comm, command); err != nil {
@@ -118,8 +131,8 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	// 	return nil
 	// }
 
-	o.Output(fmt.Sprintf("Running the following Ansible plays on target host: \n --> Playbook: %s \n --> Plays: %s", remotePlaybookPath, strings.Join(p.Hosts, ",")))
-	if err := p.runCommand(o, comm, command); err != nil {
+	o.Output(fmt.Sprintf("Running the following Ansible plays on target host: \n --> Playbook: %s \n --> Plays: %s", remotePlaybookPath, strings.Join(p.Hosts, ", ")))
+	if err := p.runCommand(o, comm, command2); err != nil {
 		return err
 	}
 
@@ -156,6 +169,12 @@ func (p *Provisioner) Validate() error {
 			return fmt.Errorf("Invalid host. hosts: %s", p.Hosts)
 		}
 	}
+
+	// for _, instanceid := range p.Hosts {
+	// 	if instanceid == "" {
+	// 		return fmt.Errorf("Invalid host. hosts: %s", p.InstanceID)
+	// 	}
+	// }
 
 	return nil
 }
