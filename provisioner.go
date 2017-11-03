@@ -96,12 +96,14 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	}
 
 	// build a command to run ansible on the host machine
-	command := fmt.Sprintf("curl -LSs https://raw.githubusercontent.com/armenr/terraform-provisioner-ansible/master/ansible-local.py | python - --playbook=%s --hosts=%s --plays=%s --group_vars=%s --extra_vars='%s'",
-		remotePlaybookPath,
-		strings.Join(p.Hosts, ","),
-		strings.Join(p.Plays, ","),
-		strings.Join(p.GroupVars, ","),
-		string(extraVars))
+	// command := fmt.Sprintf("curl -LSs https://raw.githubusercontent.com/armenr/terraform-provisioner-ansible/master/ansible-local.py | python - --playbook=%s --hosts=%s --plays=%s --group_vars=%s --extra_vars='%s'",
+	// 	remotePlaybookPath,
+	// 	strings.Join(p.Hosts, ","),
+	// 	strings.Join(p.Plays, ","),
+	// 	strings.Join(p.GroupVars, ","),
+	// 	string(extraVars))
+
+	command2 := fmt.Sprintf("ansible-playbook %s", remotePlaybookPath)
 
 	// o.Output(fmt.Sprintf("running command: %s", command))
 	// if err := p.runCommand(o, comm, command); err != nil {
