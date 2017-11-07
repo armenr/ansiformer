@@ -31,16 +31,15 @@ const (
 // )
 
 type Provisioner struct {
-	useSudo            bool
-	ansibleLocalScript string
-	AnsibleVersion     string            `mapstructure:"ansible_version"` // Ansible version to install
-	Playbook           string            `mapstructure:"playbook"`
-	Plays              []string          `mapstructure:"plays"`
-	Hosts              []string          `mapstructure:"hosts"`
-	ModulePath         string            `mapstructure:"module_path"`
-	GroupVars          []string          `mapstructure:"group_vars"` // group_vars are expected to be under <ModulePath>/group_var/name
-	ExtraVars          map[string]string `mapstructure:"extra_vars"`
-	InstanceID         string            `mapstructure:"instance_id"`
+	useSudo        bool
+	AnsibleVersion string            `mapstructure:"ansible_version"` // Ansible version to install
+	Playbook       string            `mapstructure:"playbook"`
+	Plays          []string          `mapstructure:"plays"`
+	Hosts          []string          `mapstructure:"hosts"`
+	ModulePath     string            `mapstructure:"module_path"`
+	GroupVars      []string          `mapstructure:"group_vars"` // group_vars are expected to be under <ModulePath>/group_var/name
+	ExtraVars      map[string]string `mapstructure:"extra_vars"`
+	InstanceID     string            `mapstructure:"instance_id"`
 	// AnsibleInventoryFile string            `mapstructure:"inventory_file"`
 }
 

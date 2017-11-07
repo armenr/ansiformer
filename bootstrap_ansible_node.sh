@@ -1,8 +1,7 @@
 #!/bin/bash
-# Bootstrap for ansiblized node
-# Author: Ravi Bhure <ravibhure@gmail.com>
-# Usages: curl -L https://raw.githubusercontent.com/ravibhure/terraform-provisioner-ansible/master/bootstrap_ansible_node.sh | sudo bash
-# ANSIBLE_VERSION if not provided, script will install default ansible version which is 2.3.1
+# Usages: curl -L https://raw.githubusercontent.com/armenr/Ansiformer/master/bootstrap_ansible_node.sh | sudo bash
+# This script elects to install Ansible via Pip rather than OS userland repositories in order to maintain version selection flexibility
+# ANSIBLE_VERSION if not provided, script will install latest available Ansible distribution
 ANSIBLE_VERSION=$1
 
 

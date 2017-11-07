@@ -1,6 +1,9 @@
 # terraform-provisioner-ansible
 > Provision terraform resources with ansible
 
+## Problems I'm Seeking to Address 
+When you flip a switch, you expect something to happen, and for it to exit with success or failure at the end of the lifecycle of that effort. 
+
 ## Overview
 
 **[Terraform](https://github.com/hashicorp/terraform)** is a tool for automating infrastructure. Terraform includes the ability to provision resources at creation time through a plugin api. Currently, some builtin [provisioners](https://www.terraform.io/docs/provisioners/) such as **chef** and standard scripts are provided; this provisioner introduces the ability to provision an instance at creation time with **ansible**.
