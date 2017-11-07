@@ -2,11 +2,9 @@
 # Usages: curl -L https://raw.githubusercontent.com/armenr/Ansiformer/master/bootstrap_ansible_node.sh | sudo bash
 # This script elects to install Ansible via Pip rather than OS userland repositories in order to maintain version selection flexibility
 # ANSIBLE_VERSION if not provided, script will install latest available Ansible distribution
+
 ANSIBLE_VERSION=$1
 
-
-# just to sleep
-# sleep 5 ;
 if [[ -f /etc/redhat-release ]]; then 
   yum -y update  > /dev/null 2>&1 && \
   yum -q -y install gcc libffi-devel openssl-devel python-devel  > /dev/null 2>&1;
