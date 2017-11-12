@@ -1,8 +1,6 @@
-# terraform-provisioner-ansible
-> Provision terraform resources with ansible
+# Ansiformer - Radical DevOps Simplicity
 
 ## Problems I'm Seeking to Address 
-When you flip a switch, you expect something to happen, and for it to exit with success or failure at the end of the lifecycle of that effort. 
 
 ## Overview
 
