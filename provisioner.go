@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	installURL = "https://github.com/armenr/terraform-provisioner-ansible/raw/master/bootstrap_ansible_node.sh"
+	installURL = "https://github.com/armenr/ansiformer/raw/master/bootstrap_ansible_node.sh"
 )
 
 const (
@@ -84,7 +84,7 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	deleteCommand := fmt.Sprintf("rm -rf /tmp/ansible")
 
 	if _, err := os.Stat(tmpPath); !os.IsExist(err) {
-		o.Output(fmt.Sprintf("Removing old playbooks plays with: %s", deleteCommand))
+		o.Output(fmt.Sprintf("Removing old playbooks plays with PAREV BLEEG! : %s", deleteCommand))
 		if err := p.runCommand(o, comm, deleteCommand); err != nil {
 			return err
 		}

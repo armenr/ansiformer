@@ -5,3 +5,4 @@ default.yml
 roles
 installer.sh
 terraform-provisioner-ansible
+ansiformer
