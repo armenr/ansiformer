@@ -26,13 +26,9 @@ const (
 	tmpInventory = "/tmp"
 )
 
-// const (
-// 	hostfile = "/tmp/ansible"
-// )
-
 type Provisioner struct {
 	useSudo        bool
-	AnsibleVersion string            `mapstructure:"ansible_version"` // Ansible version to install
+	AnsibleVersion string            `mapstructure:"ansible_version"`
 	Playbook       string            `mapstructure:"playbook"`
 	Plays          []string          `mapstructure:"plays"`
 	Hosts          []string          `mapstructure:"hosts"`
@@ -40,7 +36,6 @@ type Provisioner struct {
 	GroupVars      []string          `mapstructure:"group_vars"` // group_vars are expected to be under <ModulePath>/group_var/name
 	ExtraVars      map[string]string `mapstructure:"extra_vars"`
 	InstanceID     string            `mapstructure:"instance_id"`
-	// AnsibleInventoryFile string            `mapstructure:"inventory_file"`
 }
 
 func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) error {
@@ -55,11 +50,6 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	prefix := ""
 	// Ansible version to be install
 	ansible_version := p.AnsibleVersion
-	// instanceid := p.InstanceID
-
-	// commands that are needed to setup a basic environment to run the `ansible-local.py` script
-	// TODO pivot based upon different platforms and allow optional python provision steps
-	// TODO this should be configurable for folks who want to customize this
 
 	// Check before install ansible, system to be ready
 	err = p.runCommand(o, comm, fmt.Sprintf("%sbash -c 'until curl -o /dev/null -sIf %s ; do echo \"Waiting for ansible installURL to be available..\"; ((c++)) && ((c==20)) && break ; sleep 5 ; done'", prefix, installURL))
@@ -104,32 +94,13 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	// 	return err
 	// }
 
-	// build a command to run ansible on the host machine
-	// command := fmt.Sprintf("curl -LSs https://raw.githubusercontent.com/armenr/terraform-provisioner-ansible/master/ansible-local.py | python - --playbook=%s --hosts=%s --plays=%s --group_vars=%s --extra_vars='%s'",
-	// 	remotePlaybookPath,
-	// 	strings.Join(p.Hosts, ","),
-	// 	strings.Join(p.Plays, ","),
-	// 	strings.Join(p.GroupVars, ","),
-	// 	string(extraVars))
-
 	command2 := fmt.Sprintf("ansible-playbook -i %s/%s-inventory %s",
 		tmpInventory,
 		string(p.InstanceID),
 		remotePlaybookPath)
 
-	// o.Output(fmt.Sprintf("running command: %s", command))
-	// if err := p.runCommand(o, comm, command); err != nil {
-	// 	return err
-	// }
-
-	// 	o.Output(fmt.Sprintf("Running ansible plays with: \n %s", command))
-	// 	if err := p.runCommand(o, comm, command); err != nil {
-	// 		return err
-	// 	}
-
-	// 	return nil
-	// }
-
+	// TODO: Think of ways to make this work better for complex tag scenarios, with inheritance, etc.
+	// Will need community feedback on this one.
 	o.Output(fmt.Sprintf("Running the following Ansible plays on target host: \n --> Playbook: %s \n --> Plays: %s", remotePlaybookPath, strings.Join(p.Hosts, ", ")))
 	if err := p.runCommand(o, comm, command2); err != nil {
 		return err
