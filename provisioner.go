@@ -74,7 +74,7 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	deleteCommand := fmt.Sprintf("rm -rf /tmp/ansible")
 
 	if _, err := os.Stat(tmpPath); !os.IsExist(err) {
-		o.Output(fmt.Sprintf("Removing old playbooks plays with PAREV BLEEG! : %s", deleteCommand))
+		o.Output(fmt.Sprintf("Removing old playbooks plays with command: %s", deleteCommand))
 		if err := p.runCommand(o, comm, deleteCommand); err != nil {
 			return err
 		}
