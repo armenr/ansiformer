@@ -123,3 +123,5 @@ See release notes for changes https://github.com/armenr/ansiformer/releases
 
 ## Inspiration - Standing on the shoulders of giants
 * This project is based on [ravibhure's]((https://github.com/ravibhure/terraform-provisioner-ansible)) fork of [jonmorehouse](https://github.com/jonmorehouse/terraform-provisioner-ansible) original Ansible plugin for Terraform.
+
+Since it has diverged so greatly from its parents, I've decided it's best to make it its own thing.
