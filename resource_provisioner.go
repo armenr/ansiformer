@@ -2,21 +2,22 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/hashicorp/terraform/communicator"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/mitchellh/mapstructure"
-	"log"
-	"time"
 )
 
 type ResourceProvisioner struct {
-	playbook  string // filepath for the
-	ansible_version  string // ansible version to be install
-	inventory string
+	playbook        string // filepath for the
+	ansible_version string // ansible version to be install
+	inventory       string
 
-	group_vars    []string          // list of group-vars to be passed to the provisioner
-	hosts     []string          // list of host groups to apply to the provisioner
-	extraVars map[string]string // extra variables that can be passed to the provisioner
+	group_vars []string          // list of group-vars to be passed to the provisioner
+	hosts      []string          // list of host groups to apply to the provisioner
+	extraVars  map[string]string // extra variables that can be passed to the provisioner
 }
 
 func (r *ResourceProvisioner) Stop() error {
@@ -41,7 +42,6 @@ func (r *ResourceProvisioner) Apply(
 		return err
 	}
 	provisioner.useSudo = true
-	provisioner.ansibleLocalScript = fmt.Sprintf("https://raw.githubusercontent.com/armer/terraform-provisioner-ansible/%s/ansible-local.py", VERSION)
 
 	// ensure that this is a linux machine
 	if s.Ephemeral.ConnInfo["type"] != "ssh" {

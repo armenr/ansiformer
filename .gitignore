@@ -4,3 +4,5 @@ default.yml
 .DS_STORE
 roles
 installer.sh
+terraform-provisioner-ansible
+ansiformer
