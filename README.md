@@ -1,12 +1,62 @@
 # Ansiformer - Radical DevOps Simplicity
 
-## Problems I'm Seeking to Address 
+This plugin - and the included terraform module  - make it easy to provision hosts with Ansible at the time of instance creation.
 
-## Overview
+This pattern seeks to address certain difficulties and issues with the common DevOps workflow around Ansible + Terraform. 
 
-**[Terraform](https://github.com/hashicorp/terraform)** is a tool for automating infrastructure. Terraform includes the ability to provision resources at creation time through a plugin api. Currently, some builtin [provisioners](https://www.terraform.io/docs/provisioners/) such as **chef** and standard scripts are provided; this provisioner introduces the ability to provision an instance at creation time with **ansible**.
+1. Avoid disparity or mismatch between Ansible's inventory and Terraform's State
+2. You can dynamically pass resource and module outputs from terraform into cofiguration vars for Ansible from a single contextual plane
+    - Example: Terraform creates an RDS instance, or an S3 VPC Endpoint - and you need to pass whatever the computed address of that resource is (IP, DNS, etc) to a configuration parameter in an Ansible playbook by including that as a variable. This makes that a piece of cake.
 
-This provisioner provides the ability to apply **host-groups**, **plays** or **roles** against a host at provision time. Ansible is run on the host itself and this provisioner configures a dynamic inventory on the fly as resources are created.
+
+To install:
+run terraform with ``` terraform apply -plugin-dir=PATH```
+OR, ```~/.terraform.d/plugins/terraform-provisioner-ansiformer_v1.0.12```
+## Contents
+
+* [Quick Start](#quick-start)
+* [Examples](https://github.com/serverless/examples)
+* [Features](#features)
+
+## <a name="features"></a>Features
+
+
+## Overview 
+
+Terraform includes the ability to provision resources at creation time through a plugin api. Currently, some builtin [provisioners](https://www.terraform.io/docs/provisioners/) such as **chef** and standard scripts are provided; this provisioner  the ability to provision an instance at creation time with **ansible**.
+
+This provisioner provides the ability to apply **host-groups**, **group vars**, **extra vars**, **plays**, or **roles** against a host at provision time. Ansible is run on the host itself and this provisioner configures and copies over a corresponding dynamic inventory file for that host, on the fly, as resources are created.
+
+**Reasoning** for generating the dynamic inventory file is due to the nature of how ansible runs playbooks on local hosts. From [Ansible's Documentation](http://docs.ansible.com/ansible/latest/playbooks_delegation.html#local-playbooks):
+>To run an entire playbook locally, just set the “hosts:” line to “hosts: 127.0.0.1” and then run the playbook like so:
+>
+>   `ansible-playbook playbook.yml --connection=local`
+
+This is problematic, since users would have to modify their existing playbooks, or create copies of existing playbooks that are mapped to run against 'localhost' rather than maintaining their existing playbooks, in conventional manner. This is unattractive and undesirable. See example below: 
+
+1 - Conventional Ansible approach
+```
+- hosts: lamp_fullstack
+  become: true
+  roles:
+    - user.mysql
+    - user.php
+    - user.apache2
+```
+
+2 - "Ansible local" approach
+```
+- hosts: localhost
+  become: true
+  roles:
+    - user.mysql
+    - user.php
+    - user.apache2
+```
+
+I've solved this problem by dynamically templating an inventory file that gets dropped off in /tmp/ of the target instance via the included ansiformer-tf-module
+
+## EVERYTHing BELOW THIS LINE IS WRONG FOR NOW
 
 The ansible terraform provisioner configures Ansible to run on the machine by Terraform from local Playbook and Role files. Playbooks and Roles can be uploaded from your local machine to the remote machine. Ansible is run in [local mode](https://docs.ansible.com/ansible/playbooks_delegation.html#local-playbooks) via the ansible-playbook command.
 
@@ -69,8 +119,7 @@ Check out [example](example/) for a more detailed walkthrough of the provisioner
 
 ## History
 
-See release notes for changes https://github.com/ravibhure/terraform-provisioner-ansible/releases
+See release notes for changes https://github.com/armenr/ansiformer/releases
 
-## Inspiration
-
-* This is forked of originally written by [jonmorehouse](https://github.com/jonmorehouse/terraform-provisioner-ansible)
+## Inspiration - Standing on the shoulders of giants
+* This project is based on [ravibhure's]((https://github.com/ravibhure/terraform-provisioner-ansible)) fork of [jonmorehouse](https://github.com/jonmorehouse/terraform-provisioner-ansible) original Ansible plugin for Terraform.

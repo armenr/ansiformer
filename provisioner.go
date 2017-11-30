@@ -51,7 +51,7 @@ func (p *Provisioner) Run(o terraform.UIOutput, comm communicator.Communicator) 
 	// Ansible version to be install
 	ansible_version := p.AnsibleVersion
 
-	// Check before install ansible, system to be ready
+	// Check that the installer script is ready
 	err = p.runCommand(o, comm, fmt.Sprintf("%sbash -c 'until curl -o /dev/null -sIf %s ; do echo \"Waiting for ansible installURL to be available..\"; ((c++)) && ((c==20)) && break ; sleep 5 ; done'", prefix, installURL))
 	if err != nil {
 		return err

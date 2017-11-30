@@ -8,19 +8,19 @@ provider "aws" {
 resource "aws_instance" "ansible-test" {
   ami           = "ami-d94f5aa0"
   instance_type = "t2.micro"
-  key_name      = "ravi"
+  key_name      = "my_awesome_key"
 
   provisioner "ansible" {
     connection {
       user        = "ubuntu"
-      private_key = "${file("~/.ssh/ravi.pem")}"
+      private_key = "${file("~/.ssh/my_awesome_key.pem")}"
     }
 
-    ansible_version = "2.2.1.0"
-    playbook        = "playbook.yml"
-    plays           = ["terraform"]
-    hosts           = ["all"]
-    group_vars      = ["terraform"]
+    # ansible_version = "2.2.1.0"
+    playbook   = "playbook.yml"
+    plays      = ["terraform"]
+    hosts      = ["all"]
+    group_vars = ["terraform"]
 
     extra_vars = {
       "extra_var" = "terraform"
